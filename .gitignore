@@ -224,4 +224,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+#doc
+page5.txt
+
 
