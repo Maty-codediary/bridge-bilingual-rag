@@ -4,6 +4,11 @@ import re
 from langchain_community.document_loaders import PyMuPDFLoader
 from sentence_transformers import SentenceTransformer
 MAX_CHARS = 300
+COMPANIES = {   "data/tencent-annual-report2025.pdf": "Tencent 騰訊 2025 annual report",
+    "data/xiaomi_2025_ar_c.pdf": "Xiaomi 小米 2025 annual report",
+    "data/byd-annual-report2025.pdf": "BYD 比亚迪 2025 annual report",
+
+}
 def make_chunks(sentences, max_char = 300):
     chunks = []
     current = ""
@@ -56,7 +61,7 @@ model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 client= chromadb.PersistentClient(path='chroma_db')
 collection = client.get_or_create_collection('reports')
 
-texts = [c['text'] for c in all_chunks]
+texts = [COMPANIES[c['source']] + ':' + c['text'] for c in all_chunks]
 metadatas = [{'source': c['source'], 'page': c['page']} for c in all_chunks]
 ids = [str(i) for i in range(len(all_chunks))]
 
