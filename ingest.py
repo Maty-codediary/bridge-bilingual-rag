@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import re
 from langchain_community.document_loaders import PyMuPDFLoader
+from sentence_transformers import SentenceTransformer
 MAX_CHARS = 300
 def make_chunks(sentences, max_char = 300):
     chunks = []
@@ -26,7 +27,7 @@ files = ['data/tencent-annual-report2025.pdf', 'data/xiaomi_2025_ar_c.pdf', 'dat
 all_chunks = []
 for f in files:
     loader = PyMuPDFLoader(f)
-    pages = loader.load()
+    pages = loader.load() 
     for page in pages:
         safe_sentences = []
         text = page.page_content
@@ -48,3 +49,18 @@ for f in files:
 
 print(len(all_chunks))
 print(all_chunks[-1])
+
+import chromadb
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+client= chromadb.PersistentClient(path='chroma_db')
+collection = client.get_or_create_collection('reports')
+
+texts = [c['text'] for c in all_chunks]
+metadatas = [{'source': c['source'], 'page': c['page']} for c in all_chunks]
+ids = [str(i) for i in range(len(all_chunks))]
+
+vectors = model.encode(texts, show_progress_bar= True)
+
+collection.upsert(ids=ids, documents=texts, embeddings=vectors.tolist(),metadatas=metadatas)
+print('Stored:', collection.count())
