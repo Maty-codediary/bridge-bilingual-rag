@@ -41,8 +41,8 @@ def split_long(s, max_char=300):
         pieces.append(s[i:max_char +i])
     return pieces
 
-
-for page in pages[:3]:
+all_chunks = []
+for page in pages:
     safe_sentences = []
     text = page.page_content
     text = text.replace('\n', '')
@@ -54,7 +54,13 @@ for page in pages[:3]:
         else:
             safe_sentences.append(s)
     chunks = make_chunks(safe_sentences)
-    print(page.metadata['page'], len(chunks))
+    for c in chunks:
+        all_chunks.append({
+            'text': c,
+            'source': page.metadata['source'],
+            'page': page.metadata['page']+1
+        })
 
-
+print(len(all_chunks))
+print(all_chunks[5])
 
