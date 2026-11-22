@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import re
 from langchain_community.document_loaders import PyMuPDFLoader
 
 print('Loading Tencent 2025 annual report...')
@@ -13,3 +14,12 @@ print(page5.metadata)
 
 with open('page5.txt', 'w', encoding='utf-8')as f:
     f.write(page5.page_content)
+
+
+text = page5.page_content
+text = text.replace('\n', '')
+sentences = re.split(r'(?<=[。！？])', text)
+sentences = [s for s in sentences if s.strip()]
+print(len(sentences))
+for i,s in enumerate(sentences[:5]):
+    print(i, s)
