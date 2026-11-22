@@ -158,6 +158,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+data/
+chroma_db/
 
 # Conda environments
 conda-meta/
@@ -221,3 +223,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
