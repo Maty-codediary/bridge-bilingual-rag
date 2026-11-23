@@ -4,6 +4,7 @@ import chromadb
 from dotenv import load_dotenv
 from google import genai
 from sentence_transformers import SentenceTransformer
+from google.genai import types
 
 load_dotenv()
 
@@ -42,7 +43,11 @@ if st.button("Ask") and question:
 
     Question: {question}"""
 
-    response = gemini.models.generate_content(model="gemini-3.6-flash", contents=prompt)
+    response = gemini.models.generate_content(
+        model="gemini-3.6-flash", 
+        contents=prompt,
+        config=types.GenerateContentConfig(temperature=0)
+        )
   
 
 
@@ -52,3 +57,4 @@ if st.button("Ask") and question:
         for text, meta in zip(results["documents"][0], results["metadatas"][0]):
             st.markdown(f"**{meta['source']}**, page {meta['page']}")
             st.write(text)
+
