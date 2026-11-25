@@ -1,0 +1,26 @@
+question,company,pages,answer,type
+What was Tencent's profit attributable to shareholders in 2025?,tencent,5,"RMB 224.84 billion, up 16%",number
+What was Tencent's non-IFRS profit attributable to shareholders in 2025?,tencent,5,"RMB 259.63 billion, up 17%",number
+What was Tencent's total revenue in 2025?,tencent,9,"RMB 751.8 billion, up 14%",number
+How many monthly active users did WeChat have at the end of 2025?,tencent,5,"1,418 million (Weixin and WeChat combined)",number
+How much revenue did Tencent make from international games in 2025?,tencent,9;6,"RMB 77.4 billion, up 33% (over US$10 billion)",number
+How fast did Tencent's marketing services revenue grow in 2025?,tencent,9,Up 19% to RMB 145.0 billion,number
+What was Tencent's revenue in the fourth quarter of 2025?,tencent,13;17,"RMB 194.4 billion, up 13% year on year (trap: Q4, not full year)",trap
+What final dividend per share did Tencent propose for 2025?,tencent,7;27;119;214,HK$5.30 per share (2024: HK$4.50),number
+How did Tencent's MSCI ESG rating change?,tencent,7,Upgraded from BBB to A,fact
+"According to the chairman, what drove Tencent's growth in 2025?",tencent,5,"AI improved ad targeting and player engagement in games, and cloud revenue accelerated and reached profitability at scale",explanation
+What was BYD's revenue in 2025?,byd,17;55,"About RMB 803.97 billion, up 3.46%",number
+Did BYD's net profit grow in 2025?,byd,17;12;55,No: net profit attributable to shareholders fell 18.97% to about RMB 32.62 billion,trap
+How much did BYD invest in R&D in 2025?,byd,17;56,"About RMB 63.4 billion, up 17%",number
+How many vehicles did BYD export in 2025?,byd,3;18,"Over 1 million for the first time, 1.4 times more than the previous year",number
+In how many countries and regions does BYD operate its new energy vehicles?,byd,3;26,119 countries and regions,number
+How much did Fangchengbao's sales grow in 2025?,byd,3;56,Up 316%,number
+How many new energy vehicles did BYD sell in 2025 in total?,byd,15,"4,602,436 vehicles (table)",table
+How fast can BYD's second-generation Blade battery charge from 10% to 70%?,byd,4;18;33;50,5 minutes,fact
+How many engineers does BYD have?,byd,4;17,"More than 120,000",number
+What was Xiaomi's total revenue in 2025?,xiaomi,10;9;20,"RMB 457.3 billion, up 25.0%",number
+What was Xiaomi's adjusted net profit in 2025?,xiaomi,10,"RMB 39.2 billion, up 43.8%",number
+How much did Xiaomi's EV and AI business revenue grow in 2025?,xiaomi,10;9;16;22,Up 223.8% to RMB 106.1 billion,number
+How many new cars did Xiaomi deliver in 2025?,xiaomi,11;9;16;22,"411,082 vehicles",number
+"How many smartphones did Xiaomi ship in 2025, and what was its global rank?",xiaomi,11;14,"165.2 million units, top 3 globally with 13.3% market share",number
+How many Xiaomi Home stores were there in mainland China at the end of 2025?,xiaomi,13,"About 18,000 (net increase of over 3,000 in 2025)",number

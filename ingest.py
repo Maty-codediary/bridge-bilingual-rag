@@ -9,6 +9,24 @@ COMPANIES = {   "data/tencent-annual-report2025.pdf": "Tencent 騰訊 2025 annua
     "data/byd-annual-report2025.pdf": "BYD 比亚迪 2025 annual report",
 
 }
+
+XIAOMI_PUNCT = {"灱": "，", "˿": "。", "炀": "；", "̈": "「", "̉": "」",
+                "灿": "：", "灭": "（", "灮": "）"}
+
+def fix_xiaomi(text):
+    out = []
+    for ch in text:
+        code = ord(ch)                          # 1: character → number
+        if ch in XIAOMI_PUNCT:
+            out.append(XIAOMI_PUNCT[ch])       # 2
+        elif 0x1A00 <= code <= 0x6F00:
+            out.append(chr(code + 0x303E))      # 3: number → character
+        else:
+            out.append(ch)
+    return "".join(out)                          # 4: glue the list into a string
+
+print(fix_xiaomi("⸶"))   # test: should print 年
+
 def make_chunks(sentences, max_char = 300):
     chunks = []
     current = ""
@@ -37,6 +55,8 @@ for f in files:
         safe_sentences = []
         text = page.page_content
         text = text.replace('\n', '')
+        if "xiaomi" in f.lower():
+            text = fix_xiaomi(text)
         sentences = re.split(r'(?<=[。！？])', text)
         sentences = [s for s in sentences if s.strip()]
         for s in sentences:
