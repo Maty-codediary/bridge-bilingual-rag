@@ -86,7 +86,8 @@ texts = [COMPANIES[c['source']] + ':' + c['text'] for c in all_chunks]
 metadatas = [{'source': c['source'], 'page': c['page']} for c in all_chunks]
 ids = [str(i) for i in range(len(all_chunks))]
 
-vectors = model.encode(texts, show_progress_bar= True)
+import json
+with open("chunks.json", "w", encoding="utf-8") as f:
+    json.dump({"ids": ids, "texts": texts, "metadatas": metadatas}, f, ensure_ascii=False)
+print("Saved", len(texts))
 
-collection.upsert(ids=ids, documents=texts, embeddings=vectors.tolist(),metadatas=metadatas)
-print('Stored:', collection.count())

@@ -225,5 +225,7 @@ __marimo__/
 
 #doc
 page5.txt
+bge_vectors.npy
+chunks.json
 
 

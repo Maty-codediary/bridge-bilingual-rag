@@ -61,10 +61,10 @@ for f in files:
         sentences = [s for s in sentences if s.strip()]
         for s in sentences:
             if len(s) > MAX_CHARS:
-                safe_sentences.extend(split_long(s))
+                safe_sentences.extend(split_long(s, MAX_CHARS))
             else:
                 safe_sentences.append(s)
-        chunks = make_chunks(safe_sentences)
+        chunks = make_chunks(safe_sentences, MAX_CHARS)
         for c in chunks:
             all_chunks.append({
                 'text': c,
@@ -87,5 +87,8 @@ ids = [str(i) for i in range(len(all_chunks))]
 
 vectors = model.encode(texts, show_progress_bar= True)
 
-collection.upsert(ids=ids, documents=texts, embeddings=vectors.tolist(),metadatas=metadatas)
+BATCH = 5000
+for i in range(0, len(ids), BATCH):
+    collection.upsert(ids=ids[i:i+BATCH], documents=texts[i:i+BATCH],
+                      embeddings=vectors[i:i+BATCH].tolist(), metadatas=metadatas[i:i+BATCH])
 print('Stored:', collection.count())
