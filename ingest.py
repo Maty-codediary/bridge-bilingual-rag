@@ -16,16 +16,15 @@ XIAOMI_PUNCT = {"灱": "，", "˿": "。", "炀": "；", "̈": "「", "̉": "」
 def fix_xiaomi(text):
     out = []
     for ch in text:
-        code = ord(ch)                          # 1: character → number
+        code = ord(ch)                          
         if ch in XIAOMI_PUNCT:
-            out.append(XIAOMI_PUNCT[ch])       # 2
+            out.append(XIAOMI_PUNCT[ch])       
         elif 0x1A00 <= code <= 0x6F00:
-            out.append(chr(code + 0x303E))      # 3: number → character
+            out.append(chr(code + 0x303E))      
         else:
             out.append(ch)
-    return "".join(out)                          # 4: glue the list into a string
+    return "".join(out)                      
 
-print(fix_xiaomi("⸶"))   # test: should print 年
 
 def make_chunks(sentences, max_char = 300):
     chunks = []

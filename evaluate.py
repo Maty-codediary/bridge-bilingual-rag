@@ -14,7 +14,7 @@ SOURCES = {
 def detect_company(question):
     q = question.lower()
     for name in SOURCES:
-        if name in q:              # 1
+        if name in q:              
             return name
     return None
 
@@ -31,7 +31,7 @@ for _, row in df.iterrows():
     company_q = detect_company(row["question"])
     if company_q:
         results = collection.query(query_embeddings=q_vector, n_results=TOP_K,
-                                   where={"source": SOURCES[company_q]})   # 2, 3
+                                   where={"source": SOURCES[company_q]})   
     else:
         results = collection.query(query_embeddings=q_vector, n_results=TOP_K)  
     metas = results["metadatas"][0]

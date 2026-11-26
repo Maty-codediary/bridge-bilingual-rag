@@ -17,7 +17,22 @@ def load_tools():
     return gemini, embedder, collection
 
 gemini, embedder, collection = load_tools()
+MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite"]   
 
+def ask_gemini(prompt):
+    last_error = None
+    for model_name in MODELS:                                   
+        try:                                                 
+            response = gemini.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(temperature=0),
+            )
+            return response.text, model_name                    
+        except Exception as e: 
+            print('Failed:', model_name, e)                                 
+            last_error = e
+    raise last_error
 st.title("🌉 Bridge")
 st.caption("Ask in English. Get answers from Chinese annual reports (Tencent, BYD, Xiaomi), with the source passage.")
 
@@ -43,15 +58,9 @@ if st.button("Ask") and question:
 
     Question: {question}"""
 
-    response = gemini.models.generate_content(
-        model="gemini-3.6-flash", 
-        contents=prompt,
-        config=types.GenerateContentConfig(temperature=0)
-        )
-  
-
-
-    st.markdown(response.text)
+    answer, used_model = ask_gemini(prompt)
+    st.markdown(answer)
+    st.caption(f"Answered by {used_model}")
 
     with st.expander("📄 Passages retrieved"):
         for text, meta in zip(results["documents"][0], results["metadatas"][0]):
