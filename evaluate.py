@@ -2,8 +2,8 @@ import pandas as pd
 import chromadb
 from sentence_transformers import SentenceTransformer
 
-MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
-COLLECTION = "reports"
+MODEL_NAME = "BAAI/bge-m3"
+COLLECTION = "reports_bge"
 TOP_K = 5
 SOURCES = {
     "tencent": "data/tencent-annual-report2025.pdf",
@@ -53,4 +53,4 @@ df["hit"] = hits
 print(df[["company", "pages", "found_pages", "hit"]])
 print("Hit rate:", round(df["hit"].mean() * 100, 1), "%")  
 print(df.groupby("company")["hit"].mean() * 100)  
-df.to_clipboard_csv("eval_details.csv", index=False)                 
+df.to_csv("eval_details.csv", index=False)                 

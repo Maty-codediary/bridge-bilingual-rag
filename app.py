@@ -42,43 +42,43 @@ tab_ask, tab_eval = st.tabs(["Ask", "Evaluation"])   # 2
 
 with tab_ask:
     question = st.text_input("Your question", placeholder="What was Tencent's profit in 2025?")
-
-if st.button("Ask") and question:
-    with st.spinner("Searching the reports..."):
-        q_vector = embedder.encode([question]).tolist()
-        results = collection.query(query_embeddings=q_vector, n_results=5)
-
-    
-        context = ""
-        for text, meta in zip(results["documents"][0], results["metadatas"][0]):
-            context += f"[{meta['source']}, page {meta['page']}]\n{text}\n\n"
+    if st.button("Ask") and question:
+        with st.spinner("Searching the reports..."):
+            q_vector = embedder.encode([question]).tolist()
+            results = collection.query(query_embeddings=q_vector, n_results=5)
 
         
-        prompt = f"""You are a financial analyst. Answer in English using ONLY the passages below.
-        Quote the Chinese sentence you used, translate it, and give its source and page.
-        If the answer is not in the passages, say: "I couldn't find this in the documents."
-
-        Passages:
-        {context}
-
-        Question: {question}"""
-
-        answer, used_model = ask_gemini(prompt)
-        st.markdown(answer)
-        st.caption(f"Answered by {used_model}")
-
-        with st.expander("📄 Passages retrieved"):
+            context = ""
             for text, meta in zip(results["documents"][0], results["metadatas"][0]):
-                st.markdown(f"**{meta['source']}**, page {meta['page']}")
-                st.write(text)
+                context += f"[{meta['source']}, page {meta['page']}]\n{text}\n\n"
+
+            
+            prompt = f"""You are a financial analyst. Answer in English using ONLY the passages below.
+            Quote the Chinese sentence you used, translate it, and give its source and page.
+            If the answer is not in the passages, say: "I couldn't find this in the documents."
+
+            Passages:
+            {context}
+
+            Question: {question}"""
+
+            answer, used_model = ask_gemini(prompt)
+            st.markdown(answer)
+            st.caption(f"Answered by {used_model}")
+
+            with st.expander("📄 Passages retrieved"):
+                for text, meta in zip(results["documents"][0], results["metadatas"][0]):
+                    st.markdown(f"**{meta['source']}**, page {meta['page']}")
+                    st.write(text)
 
 with tab_eval:
     st.subheader("How well does Bridge find the right page?")
     st.write("25 questions with known answers. Hit = the correct page is among the 5 passages retrieved.")
 
     summary = pd.read_csv("eval_summary.csv")
-    st.bar_chart(summary.set_index("experiment")["hit_rate"])   # 3: bar chart
+    st.bar_chart(summary.set_index("experiment")["hit_rate"], horizontal=True)   
     st.dataframe(summary, hide_index=True)
+    st.caption('The live app uses MiniLM: bge-m3 scored best (72%) but is to large for free hosting. Swapping it in is a one-line change on a bigger server.')
 
     details = pd.read_csv("eval_details.csv")
-    st.dataframe(details, hide_index=True)
+    st.dataframe(details[['question', 'hit', 'company', 'pages', 'found_pages']], hide_index=True)
