@@ -1,0 +1,6 @@
+experiment,model,chunk_size,hit_rate
+Baseline (Xiaomi garbled),MiniLM,300,40
+Xiaomi encoding fixed,MiniLM,300,56
+Smaller chunks,MiniLM,150,56
+Bigger chunks,MiniLM,400,40
+Stronger embedding model,bge-m3,300,72

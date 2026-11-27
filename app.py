@@ -1,10 +1,12 @@
 import os
 import streamlit as st
 import chromadb
+import pandas as pd
 from dotenv import load_dotenv
 from google import genai
 from sentence_transformers import SentenceTransformer
 from google.genai import types
+
 
 load_dotenv()
 
@@ -36,34 +38,47 @@ def ask_gemini(prompt):
 st.title("🌉 Bridge")
 st.caption("Ask in English. Get answers from Chinese annual reports (Tencent, BYD, Xiaomi), with the source passage.")
 
-question = st.text_input("Your question", placeholder="What was Tencent's profit in 2025?")
+tab_ask, tab_eval = st.tabs(["Ask", "Evaluation"])   # 2
+
+with tab_ask:
+    question = st.text_input("Your question", placeholder="What was Tencent's profit in 2025?")
 
 if st.button("Ask") and question:
     with st.spinner("Searching the reports..."):
-       q_vector = embedder.encode([question]).tolist()
-    results = collection.query(query_embeddings=q_vector, n_results=5)
+        q_vector = embedder.encode([question]).tolist()
+        results = collection.query(query_embeddings=q_vector, n_results=5)
 
-    # 1. Paste the 5 chunks into one block of text, each with its source + page
-    context = ""
-    for text, meta in zip(results["documents"][0], results["metadatas"][0]):
-        context += f"[{meta['source']}, page {meta['page']}]\n{text}\n\n"
-
-    # 2. The instructions for Gemini
-    prompt = f"""You are a financial analyst. Answer in English using ONLY the passages below.
-    Quote the Chinese sentence you used, translate it, and give its source and page.
-    If the answer is not in the passages, say: "I couldn't find this in the documents."
-
-    Passages:
-    {context}
-
-    Question: {question}"""
-
-    answer, used_model = ask_gemini(prompt)
-    st.markdown(answer)
-    st.caption(f"Answered by {used_model}")
-
-    with st.expander("📄 Passages retrieved"):
+    
+        context = ""
         for text, meta in zip(results["documents"][0], results["metadatas"][0]):
-            st.markdown(f"**{meta['source']}**, page {meta['page']}")
-            st.write(text)
+            context += f"[{meta['source']}, page {meta['page']}]\n{text}\n\n"
 
+        
+        prompt = f"""You are a financial analyst. Answer in English using ONLY the passages below.
+        Quote the Chinese sentence you used, translate it, and give its source and page.
+        If the answer is not in the passages, say: "I couldn't find this in the documents."
+
+        Passages:
+        {context}
+
+        Question: {question}"""
+
+        answer, used_model = ask_gemini(prompt)
+        st.markdown(answer)
+        st.caption(f"Answered by {used_model}")
+
+        with st.expander("📄 Passages retrieved"):
+            for text, meta in zip(results["documents"][0], results["metadatas"][0]):
+                st.markdown(f"**{meta['source']}**, page {meta['page']}")
+                st.write(text)
+
+with tab_eval:
+    st.subheader("How well does Bridge find the right page?")
+    st.write("25 questions with known answers. Hit = the correct page is among the 5 passages retrieved.")
+
+    summary = pd.read_csv("eval_summary.csv")
+    st.bar_chart(summary.set_index("experiment")["hit_rate"])   # 3: bar chart
+    st.dataframe(summary, hide_index=True)
+
+    details = pd.read_csv("eval_details.csv")
+    st.dataframe(details, hide_index=True)

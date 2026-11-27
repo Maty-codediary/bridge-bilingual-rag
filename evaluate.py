@@ -52,4 +52,5 @@ df["hit"] = hits
 
 print(df[["company", "pages", "found_pages", "hit"]])
 print("Hit rate:", round(df["hit"].mean() * 100, 1), "%")  
-print(df.groupby("company")["hit"].mean() * 100)               
+print(df.groupby("company")["hit"].mean() * 100)  
+df.to_clipboard_csv("eval_details.csv", index=False)                 
