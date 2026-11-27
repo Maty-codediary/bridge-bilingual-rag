@@ -2,10 +2,16 @@ import os
 import streamlit as st
 import chromadb
 import pandas as pd
-from dotenv import load_dotenv
+import re
+import hashlib
+import tempfile
 from google import genai
-from sentence_transformers import SentenceTransformer
 from google.genai import types
+from dotenv import load_dotenv
+from chunking import split_long, make_chunks
+from sentence_transformers import SentenceTransformer
+from langchain_community.document_loaders import PyMuPDFLoader
+
 
 
 load_dotenv()
@@ -35,17 +41,52 @@ def ask_gemini(prompt):
             print('Failed:', model_name, e)                                 
             last_error = e
     raise last_error
+
+@st.cache_resource
+def index_pdf(file_bytes, file_name):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(file_bytes)                                   
+        path = tmp.name
+    pages = PyMuPDFLoader(path).load()[:30]
+
+    texts, metas = [], []
+    for page in pages:
+        text = page.page_content.replace("\n", "")
+        sentences = [s for s in re.split(r'(?<=[。！？])', text) if s.strip()]
+        safe = []
+        for s in sentences:
+            if len(s) > 300:
+                safe.extend(split_long(s, 300))
+            else:
+                safe.append(s)                                   
+        for c in make_chunks(safe, 300):
+            texts.append(c)
+            metas.append({"source": file_name, "page": page.metadata["page"] + 1})
+
+    name = "upload_" + hashlib.md5(file_bytes).hexdigest()[:8]
+    col = chromadb.EphemeralClient().get_or_create_collection(name)
+    vectors = embedder.encode(texts).tolist()                    
+    col.add(ids=[str(i) for i in range(len(texts))], documents=texts,
+            embeddings=vectors, metadatas=metas)
+    return col
+
 st.title("🌉 Bridge")
 st.caption("Ask in English. Get answers from Chinese annual reports (Tencent, BYD, Xiaomi), with the source passage.")
 
-tab_ask, tab_eval = st.tabs(["Ask", "Evaluation"])   # 2
+tab_ask, tab_eval = st.tabs(["Ask", "Evaluation"])   
 
 with tab_ask:
     question = st.text_input("Your question", placeholder="What was Tencent's profit in 2025?")
+    uploaded = st.file_uploader("Or ask about your own Chinese PDF", type="pdf")   
+    active = collection
+    if uploaded:
+        with st.spinner("Reading your PDF (30s)..."):
+            active = index_pdf(uploaded.getvalue(), uploaded.name)
+            st.caption('Only the first 30 pages are indexed, to kepp it fast on free hosting')
     if st.button("Ask") and question:
-        with st.spinner("Searching the reports..."):
+        with st.spinner("Searching the document..."):
             q_vector = embedder.encode([question]).tolist()
-            results = collection.query(query_embeddings=q_vector, n_results=5)
+            results = active.query(query_embeddings=q_vector, n_results=5)
 
         
             context = ""

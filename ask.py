@@ -14,12 +14,11 @@ question = "What was Tencent's profit in 2025?"
 q_vector = embedder.encode([question]).tolist()
 results = collection.query(query_embeddings=q_vector, n_results=5)
 
-# 1. Paste the 5 chunks into one block of text, each with its source + page
 context = ""
 for text, meta in zip(results["documents"][0], results["metadatas"][0]):
     context += f"[{meta['source']}, page {meta['page']}]\n{text}\n\n"
 
-# 2. The instructions for Gemini
+
 prompt = f"""You are a financial analyst. Answer in English using ONLY the passages below.
 Quote the Chinese sentence you used, translate it, and give its source and page.
 If the answer is not in the passages, say: "I couldn't find this in the documents."
